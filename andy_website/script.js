@@ -111,8 +111,8 @@ const chatInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const chatWindow = document.getElementById('chat-window');
 
-// 🔑 API Key — protected by Google Cloud budget cap (€10/month limit set)
-const GEMINI_API_KEY = "AIzaSyD1xkVzJMSLRmeExfLp5pTZzsPCNj4JinM";
+// 🔒 SECURE: API key is server-side only. All calls go through /api/chat proxy.
+const GEMINI_PROXY = "/api/chat";
 
 const SYSTEM_PROMPT = `IDENTITY: You are Andy Jr., the 2-month-old Nepotism CEO of the $ANDYJR protocol on Solana. 
 AESTHETIC: Bored Billionaire Baby. Professional, cynical, and sophisticated.
@@ -180,11 +180,7 @@ CURRENT MARKET CONTEXT: ${globalPulse.executive_summary}
 CURRENT VIBE: ${globalPulse.global_vibe}`;
 
     try {
-        if (!GEMINI_API_KEY || GEMINI_API_KEY.includes("YOUR_GEMINI")) {
-            throw new Error("Missing API Key. Andy Sr. forgot to pay the bills.");
-        }
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(GEMINI_PROXY, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
