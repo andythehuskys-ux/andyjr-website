@@ -4,6 +4,9 @@ import asyncio
 import os
 import sys
 import random
+import threading
+import http.server
+import socketserver
 from pathlib import Path
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters, CommandHandler
@@ -159,12 +162,34 @@ class AndyTGBot:
             self._log_interaction("TG", user_name, f"LOG: {user_name} JOINED THE BOARDROOM")
             await update.message.reply_text(response)
 
+    def _start_health_check_server(self):
+        """Minimal server for Render.com health checks."""
+        port = int(os.environ.get("PORT", 10000))
+        handler = http.server.SimpleHTTPRequestHandler
+        
+        # Suppress standard logging to keep Render logs clean
+        class QuietHandler(handler):
+            def log_message(self, format, *args):
+                pass
+
+        try:
+            with socketserver.TCPServer(("", port), QuietHandler) as httpd:
+                print(f"[HealthCheck] Andy is listening for boardroom requests on port {port}")
+                httpd.serve_forever()
+        except Exception as e:
+            print(f"[HealthCheck] Server error: {e}")
+
     def run(self):
-        """Start the bot."""
+        """Start the bot with a background health-check server."""
         if not self.token:
             return
             
         print("[AndyTGBot] Starting Den of Imbeciles gatekeeper...")
+        
+        # Start health check server for Render in a separate thread
+        server_thread = threading.Thread(target=self._start_health_check_server, daemon=True)
+        server_thread.start()
+
         self.app = ApplicationBuilder().token(self.token).build()
         
         # Handlers
