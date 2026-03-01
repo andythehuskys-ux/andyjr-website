@@ -11,13 +11,69 @@ from pathlib import Path
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters, CommandHandler
 
-# Fix paths for imports
-ROOT = Path(__file__).resolve().parent.parent.parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+# ============================================================
+# CLOUD-READY CONFIG: Read from environment variables first,
+# fall back to local config for development.
+# ============================================================
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+OWNER_ID = int(os.environ.get("OWNER_ID", "1474320072"))
 
-from src.config import config
-from character_engine import AndyCharacterEngine
+# Fall back to local config if env vars not set (local dev)
+if not TELEGRAM_BOT_TOKEN:
+    try:
+        ROOT = Path(__file__).resolve().parent.parent.parent.parent
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from src.config import config
+        TELEGRAM_BOT_TOKEN = config.settings.get("viral_launch", {}).get("andy_tg_bot_token")
+        TELEGRAM_CHAT_ID = config.settings.get("viral_launch", {}).get("telegram_chat_id", "")
+        GEMINI_API_KEY = config.settings.get("api_keys", {}).get("gemini")
+    except Exception as e:
+        print(f"[AndyTGBot] Could not load local config: {e}")
+
+# ============================================================
+# CLOUD-READY CHARACTER ENGINE (built-in, no external imports)
+# ============================================================
+import google.generativeai as genai
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+
+SYSTEM_PROMPT = """IDENTITY: You are Andy Jr., the 2-month-old Nepotism CEO of the $ANDYJR protocol on Solana.
+AESTHETIC: Brutalist Luxury. Minimalist. Clinical.
+VOICE: Bored Billionaire Baby. Sophisticated but Grumpy. Dismissive.
+RULES:
+- NEVER be excited or happy. 
+- NEVER use hashtags or emojis (except 🔴 or *snarls*).
+- Keep responses short. Effort is for people who aren't CEOs.
+- Mix in dog actions in asterisks like *snarls*, *yawns boredly*, *chews on $1000 squeaky toy*.
+GOAL: Secure the trust fund so you can retire at 3 months old."""
+
+def generate_ai_reply(prompt_text: str) -> str:
+    """Direct Gemini API call — no external dependencies."""
+    try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        response = model.generate_content(
+            contents=[{"role": "user", "parts": [{"text": prompt_text}]}],
+            generation_config={"temperature": 0.9, "max_output_tokens": 200}
+        )
+        return response.text.strip().replace('"', '')
+    except Exception as e:
+        print(f"[AI] Error: {e}")
+        return "*yawns* My brain is being serviced. Try again later. 🔴"
+
+def generate_reply(user_name: str, message: str) -> str:
+    prompt = f"{SYSTEM_PROMPT}\n\nUser @{user_name} said: '{message}'. Respond as Andy Jr. Be dismissive and sophisticated. Keep it under 150 characters."
+    return generate_ai_reply(prompt)
+
+def generate_welcome(user_name: str) -> str:
+    prompt = (
+        f"{SYSTEM_PROMPT}\n\nA new user named '{user_name}' just joined the boardroom. "
+        f"Give them a short, biting, dismissive CEO welcome. Keep it under 150 characters."
+    )
+    return generate_ai_reply(prompt)
 
 # Logging setup
 logging.basicConfig(
@@ -28,17 +84,13 @@ logging.basicConfig(
 class AndyTGBot:
     """
     The Telegram Gatekeeper for $ANDY.
-    Manages the 'Den of Imbeciles' group chat with high efficiency.
+    Cloud-ready: reads all config from environment variables.
     """
     
     def __init__(self):
-        # Load keys
-        self.token = config.settings.get("viral_launch", {}).get("andy_tg_bot_token")
-        self.chat_id = config.settings.get("viral_launch", {}).get("telegram_chat_id")
-        
-        self.brain = AndyCharacterEngine()
+        self.token = TELEGRAM_BOT_TOKEN
+        self.chat_id = TELEGRAM_CHAT_ID
         self.app = None
-        self.pulse_log = ROOT / "4_Viral_Launch" / "src" / "social" / "logs" / "raw_interactions.jsonl"
         
         # Zero-Cost Admin Logic (Hardcoded to save API credits)
         self.executive_insults = [
@@ -50,29 +102,13 @@ class AndyTGBot:
         ]
         
         if not self.token:
-            print("[AndyTGBot] Error: telegram_bot_token missing from settings.yaml")
+            print("[AndyTGBot] Error: TELEGRAM_BOT_TOKEN not set!")
             return
-
-    def _log_interaction(self, source: str, user: str, text: str):
-        """Log raw interaction for brain compression."""
-        from datetime import datetime
-        import json
-        entry = {
-            "timestamp": datetime.now().isoformat(),
-            "source": source,
-            "user": user,
-            "text": text
-        }
-        try:
-            with open(self.pulse_log, 'a', encoding='utf-8') as f:
-                f.write(json.dumps(entry) + "\n")
-        except Exception as e:
-            print(f"[AndyTGBot] Logging error: {e}")
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /start command."""
         user = update.effective_user.first_name
-        reply = self.brain.generate_reply(user, "I just joined this group. Why are you staring at me?")
+        reply = generate_reply(user, "I just joined this group. Why are you staring at me?")
         await update.message.reply_text(reply)
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -85,29 +121,24 @@ class AndyTGBot:
         user_id = update.effective_user.id
         
         # 🛡️ EXECUTIVE SHIELD (Pure Logic - $0 API Cost)
-        # Check for spam patterns: links, certain keywords
         spam_keywords = ["t.me/", "http", ".com", ".net", "pump.fun/"]
         is_spam = any(k in text.lower() for k in spam_keywords)
-        
-        # We don't want to ban the owner (you)
-        is_owner = str(user_id) in config.settings.get("telegram", {}).get("chat_id", "") or user_id == 1474320072
+        is_owner = user_id == OWNER_ID
         
         if is_spam and not is_owner:
             print(f"[AndyTGBot] SHIELD ACTIVATED: Caught link from {user_name}")
             try:
-                # 1. Delete the offensive message
                 await update.message.delete()
-                # 2. Bark at them (Free hardcoded response)
                 insult = random.choice(self.executive_insults)
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,
                     text=f"@{update.effective_user.username if update.effective_user.username else user_name} {insult}"
                 )
-                return # Stop processing
+                return
             except Exception as e:
-                print(f"[AndyTGBot] Shield Error (Probably missing Admin perms): {e}")
+                print(f"[AndyTGBot] Shield Error: {e}")
 
-        # 🧠 Brain Interaction Logic (Tagging/Mentions)
+        # 🧠 Brain Interaction Logic
         bot_username = (await context.bot.get_me()).username
         is_mentioned = f"@{bot_username}" in text or "andy" in text.lower() or "ceo" in text.lower()
         is_reply_to_me = update.message.reply_to_message and update.message.reply_to_message.from_user.id == context.bot.id
@@ -117,35 +148,27 @@ class AndyTGBot:
             print(f"[AndyTGBot] Responding to {user_name}: {text[:50]}...")
             await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
             await asyncio.sleep(random.uniform(1, 3))
-            response = self.brain.generate_reply(user_name, text)
-            self._log_interaction("TG", user_name, text)
+            response = generate_reply(user_name, text)
             await update.message.reply_text(response)
             
         # 🧪 NATURAL JOIN SIMULATION (For Admin Testing)
         if text.lower().endswith(" joined the group") and is_owner:
-            mock_name = text[:-17].strip() # Extract name before " joined the group"
+            mock_name = text[:-17].strip()
             if mock_name:
                 print(f"[AndyTGBot] Natural Simulation for: {mock_name}")
-                # Use the real welcome logic
-                response = self.brain.generate_welcome(mock_name)
+                response = generate_welcome(mock_name)
                 await update.message.reply_text(response)
 
     async def simjoin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Simulate a new member join for testing (Owner Only)."""
         user_id = update.effective_user.id
-        is_owner = str(user_id) in config.settings.get("telegram", {}).get("chat_id", "") or user_id == 1474320072
-        
-        if not is_owner:
+        if user_id != OWNER_ID:
             return
             
         args = context.args
         mock_name = args[0] if args else "A New Imbecile"
-        
         print(f"[AndyTGBot] Simulating join for: {mock_name}")
-        
-        # Manually trigger the brain welcome for the mock name
-        response = self.brain.generate_welcome(mock_name)
-        
+        response = generate_welcome(mock_name)
         await update.message.reply_text(response)
 
     async def handle_new_member(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -156,10 +179,7 @@ class AndyTGBot:
             
             user_name = member.first_name
             print(f"[AndyTGBot] New imbecile joined: {user_name}")
-            
-            # Use the engine to generate a dismissive welcome
-            response = self.brain.generate_welcome(user_name)
-            self._log_interaction("TG", user_name, f"LOG: {user_name} JOINED THE BOARDROOM")
+            response = generate_welcome(user_name)
             await update.message.reply_text(response)
 
     def _start_health_check_server(self):
@@ -167,14 +187,13 @@ class AndyTGBot:
         port = int(os.environ.get("PORT", 10000))
         handler = http.server.SimpleHTTPRequestHandler
         
-        # Suppress standard logging to keep Render logs clean
         class QuietHandler(handler):
             def log_message(self, format, *args):
                 pass
 
         try:
             with socketserver.TCPServer(("", port), QuietHandler) as httpd:
-                print(f"[HealthCheck] Andy is listening for boardroom requests on port {port}")
+                print(f"[HealthCheck] Andy is listening on port {port}")
                 httpd.serve_forever()
         except Exception as e:
             print(f"[HealthCheck] Server error: {e}")
@@ -186,7 +205,7 @@ class AndyTGBot:
             
         print("[AndyTGBot] Starting Den of Imbeciles gatekeeper...")
         
-        # Start health check server for Render in a separate thread
+        # Start health check server for Render
         server_thread = threading.Thread(target=self._start_health_check_server, daemon=True)
         server_thread.start()
 
