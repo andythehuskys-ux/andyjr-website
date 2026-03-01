@@ -1,0 +1,191 @@
+<!DOCTYPE html><html><head><title>$CATTOWN</title></head><body><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$CATTOWN - The Purr-fect Ride</title>
+    <meta name="description" content="$CATTOWN - The memecoin for the viral sensation: a miniature subway station for cats!">
+    <meta name="keywords" content="CATTOWN, memecoin, crypto, cats, train, subway, viral, pump.fun">
+    <meta property="og:title" content="$CATTOWN - The Purr-fect Ride">
+    <meta property="og:description" content="$CATTOWN - The memecoin for the viral sensation: a miniature subway station for cats!">
+    <meta property="og:image" content="https://i.imgur.com/your-cat-train-image.png"> <!-- Replace with an actual image link -->
+    <meta property="og:url" content="https://cattowncoin.com"> <!-- Replace with your domain -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="$CATTOWN - The Purr-fect Ride">
+    <meta name="twitter:description" content="$CATTOWN - The memecoin for the viral sensation: a miniature subway station for cats!">
+    <meta name="twitter:image" content="https://i.imgur.com/your-cat-train-image.png"> <!-- Replace with an actual image link -->
+    <link rel="icon" href="https://i.imgur.com/your-cat-train-favicon.png" type="image/png"> <!-- Replace with an actual favicon link -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-bg: #0d0d0d;
+            --secondary-bg: #1a1a1a;
+            --accent-neon-green: #39ff14; /* Brighter neon green */
+            --text-light: #e0e0e0;
+            --text-dark: #b0b0b0;
+            --glass-bg: rgba(255, 255, 255, 0.08); /* Slightly more opaque for better readability */
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --shadow-neon: 0 0 15px var(--accent-neon-green);
+            --shadow-subtle: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Glassmorphism base style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-subtle), var(--shadow-neon);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-subtle), 0 0 25px var(--accent-neon-green);
+        }
+
+        /* Neon Glow Text */
+        .neon-glow {
+            color: var(--accent-neon-green);
+            text-shadow: 0 0 5px var(--accent-neon-green), 0 0 15px var(--accent-neon-green);
+        }
+
+        /* Header & Navigation */
+        header {
+            background: var(--secondary-bg);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--accent-neon-green);
+            text-decoration: none;
+            text-shadow: var(--shadow-neon);
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: white;
+            text-shadow: 0 0 10px var(--accent-neon-green), 0 0 20px var(--accent-neon-green);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 1.1em;
+            padding: 5px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-neon-green);
+            text-shadow: 0 0 5px var(--accent-neon-green);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent-neon-green);
+            transition: width 0.3s ease-in-out;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        #hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #000 100%);
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/your-cat-train-bg.jpg'); /* Replace with a high-res cat train background image */
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4) blur</body></html>

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viral Launch Roadmap</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #00ff88, #00aaff, #aa00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p {
+    color: #666;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+  }
+
+  /* ── Section titles ── */
+  .section-title {
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #444;
+    margin: 40px 0 16px;
+  }
+
+  /* ════════════════════════════════
+     INSIGHT ROW — 3 archetypes
+  ════════════════════════════════ */
+  .archetypes {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 40px;
+    flex-wrap: wrap;
+  }
+  .archetype-card {
+    flex: 1;
+    min-width: 220px;
+    max-width: 300px;
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .archetype-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .archetype-card.dead {
+    background: rgba(255,50,50,0.05);
+    border: 1px solid rgba(255,50,50,0.2);
+  }
+  .archetype-card.alive {
+    background: rgba(0,255,136,0.05);
+    border: 1px solid rgba(0,255,136,0.2);
+  }
+  .archetype-card.target {
+    background: rgba(0,170,255,0.08);
+    border: 2px solid rgba(0,170,255,0.5);
+    box-shadow: 0 0 30px rgba(0,170,255,0.15);
+  }
+  .archetype-label {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .dead .archetype-label   { color: #ff5555; }
+  .alive .archetype-label  { color: #00ff88; }
+  .target .archetype-label { color: #00aaff; }
+  .archetype-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .archetype-tokens {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .token-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+  }
+  .token-name { font-weight: 600; color: #fff; }
+  .token-peak { color: #888; font-size: 0.68rem; }
+  .token-now  { font-size: 0.68rem; }
+  .dead  .token-now { color: #ff5555; }
+  .alive .token-now { color: #00ff88; }
+  .badge {
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .badge-dead   { background: rgba(255,50,50,0.2);   color: #ff5555; }
+  .badge-alive  { background: rgba(0,255,136,0.2);   color: #00ff88; }
+  .badge-target { background: rgba(0,170,255,0.3);   color: #00aaff; }
+  .target-label {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: #00aaff;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .hook-row {
+    margin-top: 8px;
+    font-size: 0.68rem;
+    color: #888;
+    text-align: center;
+  }
+  .hook-row span { color: #00ff88; }
+
+  /* ════════════════════════════════
+     VISION BOX
+  ════════════════════════════════ */
+  .vision-box {
+    margin: 0 40px;
+    border: 1px solid rgba(170,0,255,0.4);
+    background: rgba(170,0,255,0.05);
+    border-radius: 16px;
+    padding: 24px 32px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(170,0,255,0.1);
+  }
+  .vision-box h2 {
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff44aa, #aa00ff, #00aaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .vision-pillars {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .pillar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .pillar-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .pillar-name {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+  }
+  .pillar-example {
+    font-size: 0.7rem;
+    color: #555;
+  }
+  .pillar-connector {
+    font-size: 1.5rem;
+    color: #333;
+    align-self: center;
+    margin-top: -12px;
+  }
+
+  /* ════════════════════════════════
+     BUILD SEQUENCE — vertical flow
+  ════════════════════════════════ */
+  .sequence-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 20px;
+    gap: 0;
+  }
+  .module-card {
+    width: 100%;
+    max-width: 700px;
+    border-radius: 14px;
+    padding: 20px 24px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .module-card:hover {
+    transform: translateX(6px);
+    box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+  }
+  .module-card.m1 { background: rgba(255,150,0,0.07);  border: 1px solid rgba(255,150,0,0.25); }
+  .module-card.m2 { background: rgba(0,200,255,0.07);  border: 1px solid rgba(0,200,255,0.25); }
+  .module-card.m3 { background: rgba(0,255,136,0.07);  border: 1px solid rgba(0,255,136,0.25); }
+  .module-card.m4 { background: rgba(170,0,255,0.07);  border: 1px solid rgba(170,0,255,0.25); }
+  .module-card.m5 { background: rgba(255,50,150,0.07); border: 1px solid rgba(255,50,150,0.3); box-shadow: 0 0 30px rgba(255,50,150,0.08); }
+  .module-card.m6 { background: rgba(255,220,0,0.07);  border: 1px solid rgba(255,220,0,0.25); }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .module-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .m1 .module-number { background: rgba(255,150,0,0.3);  color: #ffaa00; border: 1px solid #ffaa00; }
+  .m2 .module-number { background: rgba(0,200,255,0.3);  color: #00ccff; border: 1px solid #00ccff; }
+  .m3 .module-number { background: rgba(0,255,136,0.3);  color: #00ff88; border: 1px solid #00ff88; }
+  .m4 .module-number { background: rgba(170,0,255,0.3);  color: #aa44ff; border: 1px solid #aa44ff; }
+  .m5 .module-number { background: rgba(255,50,150,0.3); color: #ff44aa; border: 1px solid #ff44aa; }
+  .m6 .module-number { background: rgba(255,220,0,0.3);  color: #ffdd00; border: 1px solid #ffdd00; }
+
+  .module-title-wrap { flex: 1; }
+  .module-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .module-subtitle {
+    font-size: 0.68rem;
+    color: #666;
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+  .module-file {
+    font-size: 0.6rem;
+    font-family: 'Courier New', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: #555;
+    white-space: nowrap;
+  }
+
+  .module-body {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .module-details {
+    flex: 1;
+    min-width: 200px;
+  }
+  .detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 0.75rem;
+    color: #999;
+  }
+  .detail-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .m1 .detail-dot { background: #ffaa00; }
+  .m2 .detail-dot { background: #00ccff; }
+  .m3 .detail-dot { background: #00ff88; }
+  .m4 .detail-dot { background: #aa44ff; }
+  .m5 .detail-dot { background: #ff44aa; }
+  .m6 .detail-dot { background: #ffdd00; }
+
+  .module-output {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    min-width: 120px;
+    gap: 4px;
+  }
+  .output-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #444;
+  }
+  .output-value {
+    font-size: 0.72rem;
+    font-family: 'Courier New', monospace;
+    text-align: right;
+  }
+  .m1 .output-value { color: #ffaa00; }
+  .m2 .output-value { color: #00ccff; }
+  .m3 .output-value { color: #00ff88; }
+  .m4 .output-value { color: #aa44ff; }
+  .m5 .output-value { color: #ff44aa; }
+  .m6 .output-value { color: #ffdd00; }
+
+  /* existing vs build tag */
+  .status-tag {
+    font-size: 0.55rem;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .tag-exists { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+  .tag-build  { background: rgba(255,150,0,0.15);  color: #ffaa00; border: 1px solid rgba(255,150,0,0.3); }
+  .tag-critical { background: rgba(255,50,150,0.15); color: #ff44aa; border: 1px solid rgba(255,50,150,0.4); }
+
+  /* arrow connector */
+  .arrow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 40px;
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 28px;
+    background: linear-gradient(to bottom, #333, #555);
+  }
+  .arrow-tip {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #555;
+  }
+  .arrow-label {
+    position: absolute;
+    left: calc(50% + 14px);
+    top: 4px;
+    font-size: 0.6rem;
+    color: #444;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* ════════════════════════════════
+     CHANNEL MATRIX
+  ════════════════════════════════ */
+  .channel-grid {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 40px;
+    flex-wrap: wrap;
+  }
+  .channel-card {
+    border-radius: 10px;
+    padding: 14px 18px;
+    min-width: 140px;
+    text-align: center;
+    position: relative;
+  }
+  .channel-card.must    { background: rgba(0,255,136,0.07); border: 1px solid rgba(0,255,136,0.3); }
+  .channel-card.good    { background: rgba(0,170,255,0.07); border: 1px solid rgba(0,170,255,0.3); }
+  .channel-card.situational { background: rgba(255,150,0,0.07); border: 1px solid rgba(255,150,0,0.25); }
+  .channel-card.skip    { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); opacity: 0.5; }
+  .channel-icon  { font-size: 1.6rem; margin-bottom: 6px; }
+  .channel-name  { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; }
+  .channel-rule  { font-size: 0.62rem; color: #666; line-height: 1.4; }
+  .channel-tag {
+    position: absolute;
+    top: -8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.5rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .must .channel-tag { background: #00ff88; color: #000; }
+  .good .channel-tag { background: #00aaff; color: #000; }
+  .situational .channel-tag { background: #ffaa00; color: #000; }
+  .skip .channel-tag { background: #333; color: #666; }
+
+  /* ════════════════════════════════
+     FINAL LAUNCH MOMENT
+  ════════════════════════════════ */
+  .launch-moment {
+    margin: 0 40px;
+    border: 1px solid rgba(255,220,0,0.3);
+    background: rgba(255,220,0,0.04);
+    border-radius: 16px;
+    padding: 24px 32px;
+    box-shadow: 0 0 40px rgba(255,220,0,0.05);
+  }
+  .launch-moment h3 {
+    color: #ffdd00;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .launch-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .launch-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    min-width: 90px;
+    text-align: center;
+  }
+  .launch-step-icon { font-size: 1.2rem; }
+  .launch-step-name { font-size: 0.62rem; color: #888; letter-spacing: 1px; }
+  .launch-arrow { color: #333; font-size: 1.2rem; }
+  .launch-final {
+    border-color: rgba(255,220,0,0.5);
+    background: rgba(255,220,0,0.08);
+    box-shadow: 0 0 20px rgba(255,220,0,0.1);
+  }
+  .launch-final .launch-step-name { color: #ffdd00; }
+
+  /* ════════════════════════════════
+     CRITICAL INSIGHT BAR
+  ════════════════════════════════ */
+  .insight-bar {
+    margin: 0 40px;
+    padding: 16px 24px;
+    border-radius: 10px;
+    background: rgba(255,50,150,0.06);
+    border-left: 3px solid #ff44aa;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .insight-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+  .insight-text { font-size: 0.78rem; color: #ccc; line-height: 1.6; }
+  .insight-text strong { color: #ff44aa; }
+
+  /* ════════════════════════════════
+     FOOTER
+  ════════════════════════════════ */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: #333;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+  }
+
+  /* M5 critical pulse */
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,50,150,0.08); }
+    50%       { box-shadow: 0 0 40px rgba(255,50,150,0.25); }
+  }
+  .module-card.m5 { animation: pulse-border 3s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <h1>Viral Launch Roadmap</h1>
+  <p>Meme × AI Agent × Game — Full Loop Strategy</p>
+</div>
+
+<!-- ══ SECTION: DATA TRUTH ══ -->
+<div class="section-title">What the data proves</div>
+<div class="archetypes">
+
+  <div class="archetype-card dead">
+    <div class="archetype-label">Archetype A — Dead</div>
+    <h3>News Derivative</h3>
+    <div class="archetype-tokens">
+      <div class="token-row">
+        <span class="token-name">PENGUIN</span>
+        <span class="token-peak">Peak $180M</span>
+        <span class="token-now">→ $8.5M</span>
+        <span class="badge badge-dead">-95%</span>
+      </div>
+      <div class="token-row">
+        <span class="token-name">UNSYS</span>
+        <span class="token-peak">Peak $2M</span>
+        <span class="token-now">→ $200K</span>
+        <span class="badge badge-dead">-90%</span>
+      </div>
+      <div class="token-row">
+        <span class="token-name">DORITO</span>
+        <span class="token-peak">Peak $200K</span>
+        <span class="token-now">→ $20K</span>
+        <span class="badge badge-dead">-90%</span>
+      </div>
+    </div>
+    <div class="hook-row">Hook: <span>None</span></div>
+  </div>
+
+  <div class="archetype-card alive target">
+    <div class="archetype-label">Archetype B — ✦ OUR TARGET</div>
+    <h3>Gamified Community</h3>
+    <div class="archetype-tokens">
+      <div class="token-row">
+        <span class="token-name">PUNCH</span>
+        <span class="token-peak">Peak $32M</span>
+        <span class="token-now">→ $29.3M</span>
+        <span class="badge badge-alive">2nd wave</span>
+      </div>
+      <div class="token-row">
+        <span class="token-name">PIPPIN</span>
+        <span class="token-peak">Peak $620M</span>
+        <span class="token-now">→ $494M</span>
+        <span class="badge badge-alive">sustained</span>
+      </div>
+    </div>
+    <div class="hook-row">Hook: <span>Burn game + AI agent</span></div>
+    <div class="target-label">← We build this</div>
+  </div>
+
+  <div class="archetype-card alive">
+    <div class="archetype-label">Archetype C — Product</div>
+    <h3>Product-Backed</h3>
+    <div class="archetype-tokens">
+      <div class="token-row">
+        <span class="token-name">VENICE</span>
+        <span class="token-peak">Peak $360M</span>
+        <span class="token-now">→ $200M</span>
+        <span class="badge badge-alive">recovered</span>
+      </div>
+    </div>
+    <div class="hook-row">Hook: <span>Real AI product + staking</span></div>
+    <div style="margin-top:10px; font-size:0.65rem; color:#555; text-align:center;">Requires months pre-work.<br>Future direction.</div>
+  </div>
+
+</div>
+
+<!-- ══ SECTION: VISION ══ -->
+<div class="section-title">Our vision</div>
+<div class="vision-box">
+  <h2>MEME + AI AGENT + GAME</h2>
+  <div style="font-size:0.75rem; color:#777; letter-spacing:1px;">The synthesis of both surviving archetypes</div>
+  <div class="vision-pillars">
+    <div class="pillar">
+      <div class="pillar-icon">🎭</div>
+      <div class="pillar-name">Meme</div>
+      <div class="pillar-example">The hook. Gets people in.</div>
+    </div>
+    <div class="pillar-connector">+</div>
+    <div class="pillar">
+      <div class="pillar-icon">🤖</div>
+      <div class="pillar-name">AI Agent</div>
+      <div class="pillar-example">The soul. Gives people a reason to care.</div>
+    </div>
+    <div class="pillar-connector">+</div>
+    <div class="pillar">
+      <div class="pillar-icon">🎮</div>
+      <div class="pillar-name">Game</div>
+      <div class="pillar-example">The loop. Brings people back.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION: CRITICAL INSIGHT ══ -->
+<div class="section-title">The critical insight</div>
+<div class="insight-bar">
+  <div class="insight-icon">⚡</div>
+  <div class="insight-text">
+    <strong>Module 5 (Interactive Hook) is what separates alive from dead.</strong>
+    Every token without a hook bled -90%. Every token with one survived or had a second wave.
+    The hook doesn't have to be complex — PUNCH's game is just a button that increments a counter.
+    But it must exist. Without it, you are DORITO.
+  </div>
+</div>
+
+<!-- ══ SECTION: BUILD SEQUENCE ══ -->
+<div class="section-title">Build sequence — pump.fun launches last</div>
+<div class="sequence-wrapper">
+
+  <!-- MODULE 1 -->
+  <div class="module-card m1">
+    <div class="module-header">
+      <div class="module-number">1</div>
+      <div class="module-title-wrap">
+        <div class="module-title">X / Twitter Auto-Poster</div>
+        <div class="module-subtitle">The primary channel. Where 100% of crypto attention lives.</div>
+      </div>
+      <span class="status-tag tag-build">Build</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Schedule GM posts, memes, CA announcements</div>
+        <div class="detail-item"><div class="detail-dot"></div>Gemini generates tweet content from narrative</div>
+        <div class="detail-item"><div class="detail-dot"></div>Reply to viral tweets with CA + meme</div>
+        <div class="detail-item"><div class="detail-dot"></div>Pin tweet: ticker + CA + website + Telegram</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">@ProjectHandle</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">social/x_poster.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">
+    <div class="arrow-line"></div>
+    <div class="arrow-tip"></div>
+    <div class="arrow-label">generates project identity</div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module-card m2">
+    <div class="module-header">
+      <div class="module-number">2</div>
+      <div class="module-title-wrap">
+        <div class="module-title">Landing Page</div>
+        <div class="module-subtitle">90% already built. Upgrade with real links + logo + deploy.</div>
+      </div>
+      <span class="status-tag tag-exists">Upgrade</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Wire real X + Telegram links (from modules 1 & 3)</div>
+        <div class="detail-item"><div class="detail-dot"></div>Generate logo via Gemini Image / DALL-E</div>
+        <div class="detail-item"><div class="detail-dot"></div>Auto-deploy to Vercel / GitHub Pages</div>
+        <div class="detail-item"><div class="detail-dot"></div>Embed DexScreener chart (CA added post-launch)</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">https://project.xyz</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">generators/asset_gen.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">
+    <div class="arrow-line"></div>
+    <div class="arrow-tip"></div>
+    <div class="arrow-label">credibility signal</div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module-card m3">
+    <div class="module-header">
+      <div class="module-number">3</div>
+      <div class="module-title-wrap">
+        <div class="module-title">Telegram Group + Auto-Bot</div>
+        <div class="module-subtitle">Community home base. Keeps alive without manual effort.</div>
+      </div>
+      <span class="status-tag tag-exists">Infra Exists</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Welcome bot: greet new members + CA + buy link</div>
+        <div class="detail-item"><div class="detail-dot"></div>Price bot: DexScreener updates every N minutes</div>
+        <div class="detail-item"><div class="detail-dot"></div>Activity bot: Gemini-generated memes (no dead chat)</div>
+        <div class="detail-item"><div class="detail-dot"></div>Admin bot: anti-spam, removes scam links</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">t.me/ProjectGroup</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">social/telegram_group.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">
+    <div class="arrow-line"></div>
+    <div class="arrow-tip"></div>
+    <div class="arrow-label">community ready</div>
+  </div>
+
+  <!-- MODULE 4 — CRITICAL -->
+  <div class="module-card m5">
+    <div class="module-header">
+      <div class="module-number">4</div>
+      <div class="module-title-wrap">
+        <div class="module-title">AI Character + Game Hook ✦ CRITICAL</div>
+        <div class="module-subtitle">This is what separates alive from dead. Build this or you're DORITO.</div>
+      </div>
+      <span class="status-tag tag-critical">Critical</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Gemini-powered personality: speaks in Telegram, posts on X</div>
+        <div class="detail-item"><div class="detail-dot"></div>Reacts to price milestones, new holders, market events</div>
+        <div class="detail-item"><div class="detail-dot"></div>Game mechanic: interact → burn tokens / unlock content</div>
+        <div class="detail-item"><div class="detail-dot"></div>Public counter (like PUNCH's PunchMeter) for social proof</div>
+        <div class="detail-item"><div class="detail-dot"></div>Converts token from "a coin" to "a character people follow"</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">Living AI character</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">social/ai_character.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">
+    <div class="arrow-line"></div>
+    <div class="arrow-tip"></div>
+    <div class="arrow-label">full infra ready</div>
+  </div>
+
+  <!-- MODULE 5 -->
+  <div class="module-card m4">
+    <div class="module-header">
+      <div class="module-number">5</div>
+      <div class="module-title-wrap">
+        <div class="module-title">Orchestrator</div>
+        <div class="module-subtitle">One command that triggers modules 1→4 in sequence.</div>
+      </div>
+      <span class="status-tag tag-build">Build</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Triggered by monitor.py signal OR manually</div>
+        <div class="detail-item"><div class="detail-dot"></div>Runs all modules sequentially with error handling</div>
+        <div class="detail-item"><div class="detail-dot"></div>Sends "LAUNCH READY" Telegram to you with all links</div>
+        <div class="detail-item"><div class="detail-dot"></div>Logs everything to Google Sheets Viral_Monitor tab</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">LAUNCH READY alert</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">run_full_launch.py</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-connector">
+    <div class="arrow-line"></div>
+    <div class="arrow-tip"></div>
+    <div class="arrow-label">infrastructure complete</div>
+  </div>
+
+  <!-- MODULE 6 — PUMP.FUN LAST -->
+  <div class="module-card m6">
+    <div class="module-header">
+      <div class="module-number">6</div>
+      <div class="module-title-wrap">
+        <div class="module-title">🚀 Pump.fun Token Launcher — LAST</div>
+        <div class="module-subtitle">Deploy ONLY when all 5 modules are live. CA wires into everything simultaneously.</div>
+      </div>
+      <span class="status-tag tag-build">Build Last</span>
+    </div>
+    <div class="module-body">
+      <div class="module-details">
+        <div class="detail-item"><div class="detail-dot"></div>Generate fresh Solana deployer wallet</div>
+        <div class="detail-item"><div class="detail-dot"></div>Call Pump.fun API: name, ticker, description, image</div>
+        <div class="detail-item"><div class="detail-dot"></div>Buy initial supply in same TX (Jito bundle)</div>
+        <div class="detail-item"><div class="detail-dot"></div>CA auto-pastes into landing page, Telegram, X pin</div>
+        <div class="detail-item"><div class="detail-dot"></div>DexScreener picks up pair automatically</div>
+      </div>
+      <div class="module-output">
+        <div class="output-label">Output</div>
+        <div class="output-value">Contract Address</div>
+        <div class="output-label" style="margin-top:6px">File</div>
+        <div class="module-file">solana/launcher.py</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SECTION: LAUNCH MOMENT ══ -->
+<div class="section-title">The launch moment</div>
+<div class="launch-moment">
+  <h3>⚡ Everything fires simultaneously when token deploys</h3>
+  <div class="launch-steps">
+    <div class="launch-step">
+      <div class="launch-step-icon">🔑</div>
+      <div class="launch-step-name">CA Generated</div>
+    </div>
+    <div class="launch-arrow">→</div>
+    <div class="launch-step">
+      <div class="launch-step-icon">🌐</div>
+      <div class="launch-step-name">Site Updates</div>
+    </div>
+    <div class="launch-arrow">→</div>
+    <div class="launch-step">
+      <div class="launch-step-icon">🐦</div>
+      <div class="launch-step-name">X Posts Go Live</div>
+    </div>
+    <div class="launch-arrow">→</div>
+    <div class="launch-step">
+      <div class="launch-step-icon">✈️</div>
+      <div class="launch-step-name">Telegram Activates</div>
+    </div>
+    <div class="launch-arrow">→</div>
+    <div class="launch-step">
+      <div class="launch-step-icon">🤖</div>
+      <div class="launch-step-name">AI Character Live</div>
+    </div>
+    <div class="launch-arrow">→</div>
+    <div class="launch-step launch-final">
+      <div class="launch-step-icon">📊</div>
+      <div class="launch-step-name">DexScreener Live</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION: CHANNELS ══ -->
+<div class="section-title">Channel strategy</div>
+<div class="channel-grid">
+  <div class="channel-card must">
+    <div class="channel-tag">Must Have</div>
+    <div class="channel-icon">𝕏</div>
+    <div class="channel-name">X / Twitter</div>
+    <div class="channel-rule">100% of tokens live/die here. Non-negotiable.</div>
+  </div>
+  <div class="channel-card must">
+    <div class="channel-tag">Must Have</div>
+    <div class="channel-icon">🌐</div>
+    <div class="channel-name">Website</div>
+    <div class="channel-rule">All 3 survivors have one. All 3 dead tokens don't.</div>
+  </div>
+  <div class="channel-card good">
+    <div class="channel-tag">Recommended</div>
+    <div class="channel-icon">✈️</div>
+    <div class="channel-name">Telegram</div>
+    <div class="channel-rule">Where degen holders live. Needed for 2nd wave.</div>
+  </div>
+  <div class="channel-card situational">
+    <div class="channel-tag">If Visual</div>
+    <div class="channel-icon">🎵</div>
+    <div class="channel-name">TikTok</div>
+    <div class="channel-rule">PUNCH used it + had 2nd wave. Only for gamified/visual mechanics.</div>
+  </div>
+  <div class="channel-card skip">
+    <div class="channel-tag">Skip</div>
+    <div class="channel-icon">💬</div>
+    <div class="channel-name">Discord</div>
+    <div class="channel-rule">For tech products (Venice). Not memecoins.</div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  ANTIGRAVITY CRYPTO RESEARCH SYSTEM · VIRAL LAUNCH PLAYBOOK · FEB 2026
+</div>
+
+</body>
+</html>

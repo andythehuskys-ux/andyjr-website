@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$ANDYJR | Leave Me Alone.</title>
+    <!-- Google Fonts for Brutalist Luxury -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="brutalist-dark">
+
+    <!-- Custom Cursor (Part of UI Sniping) -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-logo">$ANDYJR</div>
+        <div class="nav-links">
+            <a href="https://x.com/AndythehuskyS" target="_blank" class="nav-icon" title="Twitter/X"><i
+                    class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://t.me/+kZ2dJvdakYwyNjU9" target="_blank" class="nav-icon" title="Telegram"><i
+                    class="fa-brands fa-telegram"></i></a>
+            <a href="#about">Bio</a>
+            <a href="#chat" class="btn-primary">Bother Andy</a>
+        </div>
+    </nav>
+
+    <!-- Grump-O-Meter -->
+    <div class="grump-tracker">
+        <div class="grump-label">ANNOYANCE LEVEL</div>
+        <div class="grump-bar-container">
+            <div class="grump-bar-fill" id="grump-fill"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title glitch" data-text="THE DYNASTY YOU DIDN'T ASK FOR.">
+                THE DYNASTY YOU DIDN'T ASK FOR.
+            </h1>
+            <p class="hero-subtitle">
+                Meet Andy Jr. The disgruntled, 2-month-old nepotism CEO of the $ANDY protocol. He didn't want this job.
+                He just wants to nap.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://pump.fun/" target="_blank" class="btn-secondary">Buy (He doesn't care)</a>
+                <a href="#about" class="btn-primary">Corporate Bio</a>
+            </div>
+        </div>
+        <div class="hero-image-container" id="andy-pat-zone">
+            <div class="hero-image-glow"></div>
+            <img src="assets/andy_real.jpg" alt="Andy Jr, angry puppy CEO" class="hero-image">
+            <div class="pat-overlay">DO NOT PAT</div>
+        </div>
+    </section>
+
+    <!-- The Grump Ledger (Live Stats) -->
+    <section class="stats-dashboard">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-holders">--</div>
+                <div id="change-holders" class="stat-change neutral">0%</div>
+                <div class="stat-label">Annoyed Shareholders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-mc">$0</div>
+                <div id="change-mc" class="stat-change up">+0%</div>
+                <div class="stat-label">Net Disappointment</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-price">$0</div>
+                <div id="change-price" class="stat-change down">-0%</div>
+                <div class="stat-label">Cost of Silence</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-volume">$0</div>
+                <div id="change-vol" class="stat-change up">+0%</div>
+                <div class="stat-label">Volume of Complaints</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sticky Buy Button -->
+    <a href="https://pump.fun/" target="_blank" class="sticky-cta">BUY $ANDYJR</a>
+
+    <!-- The Family Lore / "Succession" Section -->
+    <section id="about" class="about-section" style="padding: 5rem 10%; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+            <div class="about-text">
+                <h2 style="font-size: 2.5rem; letter-spacing: -1px; margin-bottom: 2rem;">A DYNASTY OF DISAPPOINTMENT.
+                </h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.1rem;"><strong>Andy Sr.</strong>
+                    pioneered the original protocol with absolute clinical precision. Now, he is retiring to a private
+                    island to escape your questions. He has left the legacy in the small, disgruntled paws of his heir.
+                </p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.1rem;">Enter <strong>Andy
+                        Jr.</strong> He's two months old. He wears bespoke turtlenecks and views 'liquidity' as
+                    something humans worry about while he's busy chewing on his trust fund documents.</p>
+                <p style="color: var(--text-muted); font-size: 1.1rem;">$ANDYJR exists solely to fund his early
+                    retirement at 3 months old. We do not want your 'community engagement'. We want your allocated
+                    capital, and then we want you to leave. 🔴</p>
+            </div>
+            <div class="about-image-container" style="position: relative;">
+                <div class="hero-image-glow" style="background: rgba(255, 51, 51, 0.1);"></div>
+                <img src="assets/andy.png" alt="Andy Sr, the grumpy founder" class="hero-image"
+                    style="transform: scale(0.9);">
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chat Interface (Foundation) -->
+    <section id="chat" class="chat-section">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Terminal: ANDY_JR_SECURE_LINK</h2>
+                <div class="status-indicator">
+                    <span class="dot red"></span>
+                    <span class="status-text">Andy is ignoring you.</span>
+                </div>
+            </div>
+            <div class="chat-window" id="chat-window">
+                <div class="message andy-msg">
+                    <p>> Ugh. You again? What do you want?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Say something annoying...">
+                <button id="send-btn" class="btn-send">Send</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="contract-address">
+                <span class="label">CA (Solana):</span>
+                <span class="address">Launching on Pump.fun... 🔴</span>
+            </div>
+            <div class="socials">
+                <a href="https://x.com/AndythehuskyS" target="_blank" title="Twitter/X"><i
+                        class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://t.me/+kZ2dJvdakYwyNjU9" target="_blank" title="Telegram"><i
+                        class="fa-brands fa-telegram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

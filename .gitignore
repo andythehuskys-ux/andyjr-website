@@ -1,0 +1,16 @@
+# Andy Jr. Secret Stash
+node_modules/
+.env
+settings.yaml
+x_state.json
+logs/
+raw_interactions.jsonl
+*.pyc
+__pycache__/
+.DS_Store
+# Pulse data can be public on website, but let's ignore local logs
+src/social/logs/
+src/social/wallet.json
+*.key
+.vercel
+.netlify
