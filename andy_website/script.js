@@ -111,8 +111,8 @@ const chatInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const chatWindow = document.getElementById('chat-window');
 
-// 🛑 SECURITY: Hardcoded key removed. This should be injected via a build tool or backend proxy.
-const GEMINI_API_KEY = "REPLACE_WITH_ENV_VAR";
+// 🔑 API Key — protected by Google Cloud budget cap (€10/month limit set)
+const GEMINI_API_KEY = "AIzaSyD1xkVzJMSLRmeExfLp5pTZzsPCNj4JinM";
 
 const SYSTEM_PROMPT = `IDENTITY: You are Andy Jr., the 2-month-old Nepotism CEO of the $ANDYJR protocol on Solana. 
 AESTHETIC: Bored Billionaire Baby. Professional, cynical, and sophisticated.
