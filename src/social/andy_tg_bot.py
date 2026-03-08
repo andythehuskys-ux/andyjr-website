@@ -196,6 +196,24 @@ class AndyTGBot:
         except Exception as e:
             print(f"[HealthCheck] Server error: {e}")
 
+    async def post_init(self, app):
+        """Start background tasks alongside the bot."""
+        print("[AndyTGBot] Connecting to X (Twitter) Engine...")
+        try:
+            # Import locally to avoid crashing if config is missing
+            try:
+                from x_poster import AndyXPoster
+            except ImportError:
+                from src.social.x_poster import AndyXPoster
+            
+            self.x_poster = AndyXPoster()
+            
+            # Start the Selective CEO listener and the Daily Organic Poster
+            asyncio.create_task(self.x_poster.run_mention_listener())
+            asyncio.create_task(self.x_poster.run_daily_poster())
+        except Exception as e:
+            print(f"[AndyTGBot] Could not initialize X tasks: {e}")
+
     def run(self):
         """Start the bot with a background health-check server."""
         if not self.token:
@@ -207,7 +225,7 @@ class AndyTGBot:
         server_thread = threading.Thread(target=self._start_health_check_server, daemon=True)
         server_thread.start()
 
-        self.app = ApplicationBuilder().token(self.token).build()
+        self.app = ApplicationBuilder().token(self.token).post_init(self.post_init).build()
         
         # Handlers
         self.app.add_handler(CommandHandler("start", self.start))

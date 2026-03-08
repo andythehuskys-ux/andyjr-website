@@ -14,8 +14,8 @@ ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.config import config
 # Import without leading dot when running as script
+# We only import config if we need it (to prevent crashes on Render where settings.yaml is ignored)
 try:
     from character_engine import AndyCharacterEngine
 except ImportError:
@@ -28,12 +28,23 @@ class AndyXPoster:
     """
     
     def __init__(self):
-        # Load keys from settings.yaml
-        keys = config.settings.get("api_keys", {})
-        self.api_key = keys.get("twitter_api_key")
-        self.api_secret = keys.get("twitter_api_secret")
-        self.access_token = keys.get("twitter_access_token")
-        self.access_secret = keys.get("twitter_access_secret")
+        # Check environment variables first (for Render/Cloud deployments)
+        self.api_key = os.environ.get("TWITTER_API_KEY")
+        self.api_secret = os.environ.get("TWITTER_API_SECRET")
+        self.access_token = os.environ.get("TWITTER_ACCESS_TOKEN")
+        self.access_secret = os.environ.get("TWITTER_ACCESS_SECRET")
+        
+        # Fallback to local settings.yaml if env vars are missing
+        if not all([self.api_key, self.api_secret, self.access_token, self.access_secret]):
+            try:
+                from src.config import config
+                keys = config.settings.get("api_keys", {})
+                self.api_key = self.api_key or keys.get("twitter_api_key")
+                self.api_secret = self.api_secret or keys.get("twitter_api_secret")
+                self.access_token = self.access_token or keys.get("twitter_access_token")
+                self.access_secret = self.access_secret or keys.get("twitter_access_secret")
+            except Exception as e:
+                print(f"[AndyXPoster] Warning: No local config found ({e})")
         
         self.client = None
         self.brain = AndyCharacterEngine() # Use the centralized brain
@@ -224,6 +235,32 @@ class AndyXPoster:
             
             # Nap between checks to satisfy Andy and Twitter rate limits
             await asyncio.sleep(300) # 5 minute check interval
+
+    async def run_daily_poster(self):
+        """Posts an organic tweet once a day."""
+        if not self.client:
+            print("[AndyXPoster] Daily poster requires active client.")
+            return
+
+        print("[AndyXPoster] Daily organic poster started. (Runs every 24h)")
+        
+        # Wait 1 hour after boot before the very first scheduled post, to avoid spamming on restarts.
+        # But for testing, maybe we want it to run sooner? Let's give it 60 minutes.
+        await asyncio.sleep(3600)
+        
+        while True:
+            try:
+                print("[AndyXPoster] Generating daily organic thought...")
+                topic = "Current macro events, inflation, or tech news contrasted with finding a good place to nap."
+                tweet = await self.generate_post(topic)
+                
+                if len(tweet) > 3:
+                    await self.post_tweet(tweet)
+            except Exception as e:
+                print(f"[AndyXPoster] Error in daily poster: {e}")
+                
+            # Sleep for exactly 1 day (86400 seconds)
+            await asyncio.sleep(86400)
 if __name__ == "__main__":
     async def main():
         poster = AndyXPoster()
