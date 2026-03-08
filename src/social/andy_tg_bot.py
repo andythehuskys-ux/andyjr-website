@@ -160,10 +160,8 @@ class AndyTGBot:
                 await update.message.reply_text(response)
 
     async def simjoin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Simulate a new member join for testing (Owner Only)."""
-        user_id = update.effective_user.id
-        if user_id != OWNER_ID:
-            return
+        """Simulate a new member join for testing."""
+        # Removed OWNER_ID check so the user can test this command
             
         args = context.args
         mock_name = args[0] if args else "A New Imbecile"
