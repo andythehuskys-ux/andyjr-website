@@ -22,7 +22,11 @@ class SolanaManager:
             print("[*] Loading existing launch wallet...")
             with open(self.wallet_path, 'r') as f:
                 secret = json.load(f)
-                self.keypair = Keypair.from_bytes(bytes(secret))
+                secret_bytes = bytes(secret)
+                if len(secret_bytes) == 32:
+                    self.keypair = Keypair.from_seed(secret_bytes)
+                else:
+                    self.keypair = Keypair.from_bytes(secret_bytes)
         else:
             print("[*] Generating NEW launch wallet...")
             self.keypair = Keypair()

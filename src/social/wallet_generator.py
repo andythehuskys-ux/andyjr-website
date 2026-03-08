@@ -47,8 +47,8 @@ def generate_wallets(num: int = NUM_WALLETS, overwrite: bool = False) -> list:
     with open(WALLETS_FILE, "w") as f:
         json.dump(wallets, f, indent=2)
 
-    print(f"\n[WalletGen] ✅ {num} wallets saved to {WALLETS_FILE}")
-    print("[WalletGen] ⚠️  THIS FILE CONTAINS PRIVATE KEYS. NEVER COMMIT IT TO GITHUB.")
+    print(f"\n[WalletGen] OK: {num} wallets saved to {WALLETS_FILE}")
+    print("[WalletGen] !! THIS FILE CONTAINS PRIVATE KEYS. NEVER COMMIT IT TO GITHUB.")
     print("[WalletGen] Next step: Fund each wallet with SOL using fund_wallets.py")
     return wallets
 
@@ -66,7 +66,14 @@ def load_wallets() -> list:
 def get_keypairs() -> list:
     """Returns a list of Keypair objects from saved wallets."""
     wallets = load_wallets()
-    return [Keypair.from_bytes(bytes(w["secret"])) for w in wallets]
+    keypairs = []
+    for w in wallets:
+        secret_bytes = bytes(w["secret"])
+        if len(secret_bytes) == 32:
+            keypairs.append(Keypair.from_seed(secret_bytes))
+        else:
+            keypairs.append(Keypair.from_bytes(secret_bytes))
+    return keypairs
 
 
 def print_wallet_summary():

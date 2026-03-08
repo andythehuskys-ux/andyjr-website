@@ -154,7 +154,7 @@ class AndyXPoster:
             self.state["replies_today"] += 1
             self._save_state()
             
-            print(f"[AndyXPoster] Replied to @{user_name}: {reply_content}")
+            print(f"[AndyXPoster] Replied to @{user_name}: {reply_content.encode('ascii', 'ignore').decode('ascii')}")
             return response.data['id']
         except Exception as e:
             print(f"[AndyXPoster] Error replying: {e}")

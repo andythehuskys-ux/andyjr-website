@@ -26,6 +26,7 @@ from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 from solders.transaction import VersionedTransaction
+from solders.message import Message, MessageV0
 
 import sys
 sys.path.append(str(Path(__file__).parent))
@@ -64,25 +65,46 @@ async def buy_from_wallet(
             )
 
         if response.status_code != 200:
-            print(f"[Bundle] ❌ Wallet {wallet_index+1}: API error {response.status_code}")
+            print(f"[Bundle] ERR: Wallet {wallet_index+1}: API error {response.status_code}")
             return False
 
-        # 2. Deserialize and sign the transaction
+        # 2. Deserialize and apply fresh blockhash
         tx_bytes = response.content
         tx = VersionedTransaction.from_bytes(tx_bytes)
         
-        # Sign with our wallet
-        tx = VersionedTransaction(tx.message, [keypair])
-
+        # Get fresh blockhash to prevent "Blockhash not found"
+        recent_blockhash = (await client.get_latest_blockhash()).value.blockhash
+        
+        # Re-build and re-sign with our wallet and fresh blockhash
+        # The message from the API needs its blockhash updated.
+        # We reconstruct the message with the fresh blockhash.
+        if isinstance(tx.message, MessageV0):
+            new_message = MessageV0(
+                header=tx.message.header,
+                account_keys=tx.message.account_keys,
+                recent_blockhash=recent_blockhash,
+                instructions=tx.message.instructions,
+                address_table_lookups=tx.message.address_table_lookups
+            )
+        else: # Message (legacy)
+            new_message = Message(
+                header=tx.message.header,
+                account_keys=tx.message.account_keys,
+                recent_blockhash=recent_blockhash,
+                instructions=tx.message.instructions
+            )
+        
+        # Create a new VersionedTransaction with the updated message and sign it
+        tx = VersionedTransaction(new_message, [keypair])
+        
         # 3. Send to blockchain
-        blockhash = (await client.get_latest_blockhash()).value.blockhash
         sig = await client.send_raw_transaction(bytes(tx))
         
-        print(f"[Bundle] ✅ Wallet {wallet_index+1} ({str(keypair.pubkey())[:8]}...): {sol_amount} SOL — tx: {str(sig.value)[:16]}...")
+        print(f"[Bundle] OK: Wallet {wallet_index+1} ({str(keypair.pubkey())[:8]}...): {sol_amount} SOL - tx: {str(sig.value)[:16]}...")
         return True
 
     except Exception as e:
-        print(f"[Bundle] ❌ Wallet {wallet_index+1} failed: {e}")
+        print(f"[Bundle] ERR: Wallet {wallet_index+1} failed: {e}")
         return False
 
 
@@ -95,15 +117,15 @@ async def bundle_buy(mint_address: str, sol_per_wallet: float, network: str):
     keypairs = get_keypairs()
 
     if not keypairs:
-        print("[Bundle] ❌ No wallets found. Run wallet_generator.py first.")
+        print("[Bundle] ERR: No wallets found. Run wallet_generator.py first.")
         return
 
     if network == "devnet":
-        print("[Bundle] ⚠️  DEVNET MODE — No real SOL spent.")
-        print("[Bundle] ⚠️  Pump.fun does not support devnet, so buy txs will fail — this tests wallet/connection only.")
+        print("[Bundle] WARN: DEVNET MODE - No real SOL spent.")
+        print("[Bundle] WARN: Pump.fun does not support devnet, so buy txs will fail - this tests wallet/connection only.")
     else:
         total = sol_per_wallet * len(keypairs)
-        print(f"[Bundle] 🔴 MAINNET MODE — Spending {total:.3f} SOL total ({sol_per_wallet} SOL × {len(keypairs)} wallets)")
+        print(f"[Bundle] LIVE: MAINNET MODE - Spending {total:.3f} SOL total ({sol_per_wallet} SOL * {len(keypairs)} wallets)")
 
     print(f"[Bundle] Token: {mint_address}")
     print(f"[Bundle] Wallets: {len(keypairs)}")
@@ -119,9 +141,9 @@ async def bundle_buy(mint_address: str, sol_per_wallet: float, network: str):
     success = sum(results)
     print(f"\n[Bundle] Complete: {success}/{len(keypairs)} buys successful.")
     if success == len(keypairs):
-        print("[Bundle] 🚀 Perfect bundle buy executed!")
+        print("[Bundle] SUCCESS! Perfect bundle buy executed!")
     else:
-        print("[Bundle] ⚠️  Some wallets failed. Check logs above.")
+        print("[Bundle] WARN: Some wallets failed. Check logs above.")
 
 
 if __name__ == "__main__":

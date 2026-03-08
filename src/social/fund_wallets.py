@@ -44,11 +44,15 @@ def fund_wallets(source_secret_list: list, total_sol: float, network: str = "dev
     Distributes SOL evenly from source wallet to all bundle wallets.
     """
     client = get_client(network)
-    source_kp = Keypair.from_bytes(bytes(source_secret_list))
+    secret_bytes = bytes(source_secret_list)
+    if len(secret_bytes) == 32:
+        source_kp = Keypair.from_seed(secret_bytes)
+    else:
+        source_kp = Keypair.from_bytes(secret_bytes)
     wallets = load_wallets()
 
     if not wallets:
-        print("[FundWallets] ❌ No bundle wallets found. Run wallet_generator.py first.")
+        print(f"[FundWallets] ERR: No bundle wallets found. Run wallet_generator.py first.")
         return
 
     per_wallet_sol = total_sol / len(wallets)
@@ -60,13 +64,15 @@ def fund_wallets(source_secret_list: list, total_sol: float, network: str = "dev
     print(f"[FundWallets] Distributing {total_sol} SOL across {len(wallets)} wallets")
     print(f"[FundWallets] Each wallet receives: {per_wallet_sol:.4f} SOL\n")
 
-    if source_balance < total_sol + 0.01:  # +0.01 for tx fees
-        print(f"[FundWallets] ❌ Insufficient balance. Need {total_sol + 0.01:.3f} SOL, have {source_balance:.4f} SOL")
-        return
-
     for w in wallets:
         dest = Pubkey.from_string(w["pubkey"])
         
+        # Check if already funded to allow resuming
+        dest_balance = get_balance(client, dest)
+        if dest_balance >= (per_wallet_sol * 0.9):
+            print(f"[FundWallets] SKIP: Wallet {w['index']+1} ({w['pubkey'][:8]}...) already funded ({dest_balance:.4f} SOL).")
+            continue
+            
         # Build transaction
         ix = transfer(TransferParams(
             from_pubkey=source_kp.pubkey(),
@@ -78,13 +84,13 @@ def fund_wallets(source_secret_list: list, total_sol: float, network: str = "dev
         msg = Message.new_with_blockhash([ix], source_kp.pubkey(), recent_blockhash)
         tx = Transaction([source_kp], msg, recent_blockhash)
         
-        resp = client.send_transaction(tx)
+        resp = client.send_raw_transaction(bytes(tx))
         sig = str(resp.value)
         
-        print(f"[FundWallets] ✅ Wallet {w['index']+1} ({w['pubkey'][:8]}...) funded — tx: {sig[:16]}...")
+        print(f"[FundWallets] OK: Wallet {w['index']+1} ({w['pubkey'][:8]}...) funded - tx: {sig[:16]}...")
         time.sleep(0.5)  # Avoid rate limiting
 
-    print(f"\n[FundWallets] ✅ All wallets funded. Ready for bundle buy.")
+    print(f"\n[FundWallets] OK: All wallets funded. Ready for bundle buy.")
     print(f"[FundWallets] Next step: Run bundle_buy.py at launch time.")
 
 
