@@ -18,8 +18,8 @@ async def post_first_tweet():
     print("--- $ANDY First Official Tweet ---")
     poster = AndyXPoster()
     
-    # Topic for the first tweet
-    topic = "The official boardroom connection is live. $ANDY protocol is entering a new phase of clinical efficiency."
+    # Topic for the launch tweet
+    topic = "The $ANDYJR protocol is LIVE. Here is the contract address: CMTGEUstWG3AjTpfKRS4yA9ujdMZgpSjcTuyroCApump. Do what you will with it. Or don't. I'm taking a nap."
     
     print(f"[*] Generating announcement about: {topic}")
     tweet_text = await poster.generate_post(topic)
